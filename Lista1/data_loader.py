@@ -2,10 +2,21 @@ import pandas as pd
 from models import Node, TransferEdge, RegularEdge, TransitGraph, TransitCalendar
 
 def time_to_seconds(time_str: str) -> int:
-    if pd.isna(time_str):
+    if pd.isna(time_str) or time_str == "":
         return 0
-    h, m, s = map(int, str(time_str).split(':'))
-    return h * 3600 + m * 60 + s
+    try:
+        parts = str(time_str).split(':')
+        if len(parts) != 3:
+            print(f"Warning: Invalid time format '{time_str}', using 0")
+            return 0
+        h, m, s = map(int, parts)
+        if not (0 <= h <= 48 and 0 <= m <= 59 and 0 <= s <= 59):
+            print(f"Warning: Invalid time values in '{time_str}', using 0")
+            return 0
+        return h * 3600 + m * 60 + s
+    except (ValueError, AttributeError) as e:
+        print(f"Warning: Error parsing time '{time_str}': {e}, using 0")
+        return 0
 
 def load_stops(df: pd.DataFrame):
     res = []

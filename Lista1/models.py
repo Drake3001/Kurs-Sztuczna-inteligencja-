@@ -90,31 +90,35 @@ class TransitGraph():
     def set_calendar(self, calendar: TransitCalendar): 
         self.calendar= calendar
     def get_valid_neighbours(self, source_node_id: str, current_time: int, current_date: str) -> list:
-        valid_moves = [] 
-        neighbours = self.adjacent.get(source_node_id, []) 
-        
+        """
+        Zwraca wszystkie możliwe odjazdy z danego przystanku (po current_time),
+        pozwalając na dowolnie długie czekanie. Wyniki są posortowane po czasie odjazdu.
+        """
+        valid_moves = []
+        neighbours = self.adjacent.get(source_node_id, [])
+
+        # Regularne odjazdy (nie transfery)
         for edge in neighbours:
             if isinstance(edge, TransferEdge):
                 continue
-                
-            if edge.departure_time >= current_time and self.calendar.is_active(edge.service_id, current_date):
+            if self.calendar.is_active(edge.service_id, current_date) and edge.departure_time >= current_time:
                 valid_moves.append((edge, edge.arrival_time, False))
-                
-        for transfer_edge in neighbours: 
+
+        # Przesiadki (transfery)
+        for transfer_edge in neighbours:
             if not isinstance(transfer_edge, TransferEdge):
                 continue
-                
             time_after_transfer = current_time + transfer_edge.transfer_time
             target_platform = transfer_edge.target_stop_id
-            
             next_neighbours = self.adjacent.get(target_platform, [])
-            for next_edge in next_neighbours: 
+            for next_edge in next_neighbours:
                 if isinstance(next_edge, TransferEdge):
                     continue
-                    
-                if next_edge.departure_time >= time_after_transfer and self.calendar.is_active(next_edge.service_id, current_date):
+                if self.calendar.is_active(next_edge.service_id, current_date) and next_edge.departure_time >= time_after_transfer:
                     valid_moves.append((next_edge, next_edge.arrival_time, True))
-                    
+
+        # Sortuj po czasie odjazdu (dla deterministyczności)
+        valid_moves.sort(key=lambda x: x[1])
         return valid_moves
     
     def check_content(self): 
