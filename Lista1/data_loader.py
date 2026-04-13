@@ -23,12 +23,10 @@ def load_stops(df: pd.DataFrame):
     grouped = {}
     
     for row in df.itertuples():
-        # 1. Pobieramy ID i usuwamy potencjalne .0 na końcu
         current_stop_id = str(row.stop_id)
         if current_stop_id.endswith('.0'):
             current_stop_id = current_stop_id[:-2]
             
-        # 2. To samo dla parent_station
         parent_station_id = ""
         if pd.notna(row.parent_station):
             parent_station_id = str(row.parent_station)
@@ -45,7 +43,6 @@ def load_stops(df: pd.DataFrame):
         )
         res.append(node)
         
-        # 3. Teraz klucze w słowniku wreszcie się pokryją!
         group_key = parent_station_id if parent_station_id != "" else current_stop_id
         
         cr_list = grouped.get(group_key, [])
@@ -80,9 +77,12 @@ def create_transfer_edges(grouped: dict[str, list], const_transfer_time: int ):
     print(f"Created {transfer_count} transfer edges")
     return transfer_edges
 
-def load_edges(df_routes: pd.DataFrame, df_trips: pd.DataFrame, df_stop_times: pd.DataFrame, graph: TransitGraph):
+def load_edges(df_routes: pd.DataFrame, df_trips: pd.DataFrame, df_stop_times: pd.DataFrame, graph: TransitGraph, df_calendar: pd.DataFrame = None):
+    """Load edges with date information from calendar if provided."""
     routes = {}
     trips = {}
+    calendar_dates = {}  
+    
     count = 1
     
     for row in df_routes.itertuples():
@@ -90,6 +90,13 @@ def load_edges(df_routes: pd.DataFrame, df_trips: pd.DataFrame, df_stop_times: p
             routes[row.route_id] = str(row.route_long_name)
         else:
             routes[row.route_id] = str(row.route_short_name)
+    
+    if df_calendar is not None:
+        for row in df_calendar.itertuples():
+            calendar_dates[str(row.service_id)] = {
+                'start': str(row.start_date),
+                'end': str(row.end_date)
+            }
             
     for row in df_trips.itertuples(): 
         trips[row.trip_id] = {
@@ -104,13 +111,22 @@ def load_edges(df_routes: pd.DataFrame, df_trips: pd.DataFrame, df_stop_times: p
         if prev and prev.trip_id == row.trip_id:
             trip_info = trips[row.trip_id]
             route_name = routes[trip_info["route_id"]]
+            service_id = str(trip_info["service_id"])
+            
+            date_start = ""
+            date_end = ""
+            if service_id in calendar_dates:
+                date_start = calendar_dates[service_id]['start']
+                date_end = calendar_dates[service_id]['end']
             
             edge = RegularEdge(
                 target_stop_id=str(row.stop_id),
                 departure_time=time_to_seconds(prev.departure_time), 
                 arrival_time=time_to_seconds(row.arrival_time),     
                 route_name=route_name,
-                service_id=str(trip_info["service_id"]),
+                service_id=service_id,
+                date_start=date_start,
+                date_end=date_end,
                 is_transfer=False
             )
             

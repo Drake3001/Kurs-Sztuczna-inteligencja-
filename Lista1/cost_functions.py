@@ -1,6 +1,5 @@
 import math
 
-#funckja do liczenia dystansu
 def calc_distance(st_lat, st_lon, ed_lat, ed_lon):
     R = 6371000.0 
     
@@ -28,20 +27,14 @@ def h_cost_time(node, target_node):
     v_ms = 44.0 
     return dist / v_ms
 
-#funkcje kosztu dla kryterium p 
 def g_cost_transfers(current_g, is_transfer, arrival_time, is_start):
-    time_penalty = arrival_time / 10000000.0
-    
-    if is_start: 
-        return time_penalty
-        
-    base_transfers = int(current_g)
-    
+    LARGE = 10**10
+    if is_start:
+        return arrival_time
+    base_transfers = current_g // LARGE
     if is_transfer:
         base_transfers += 1
-        
-    return base_transfers + time_penalty
+    return base_transfers * LARGE + arrival_time
 
 def h_cost_transfers(node, target_node):
-    # Zwracamy 0 (Algorytm Dijkstry dla przesiadek)
     return 0

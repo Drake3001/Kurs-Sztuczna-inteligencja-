@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-import datetime
+
 
 @dataclass 
 class BaseEdge:
@@ -13,10 +13,12 @@ class TransferEdge(BaseEdge):
 @dataclass 
 class RegularEdge(BaseEdge):
     target_stop_id: str
-    departure_time: int # sekundy od północy
+    departure_time: int
     arrival_time: int 
     route_name: str 
     service_id: str
+    date_start: str = ""  
+    date_end: str = ""   
     is_transfer = False
 
 @dataclass
@@ -34,11 +36,13 @@ class RouteObject:
     edge_used: BaseEdge
     is_transfer: bool
 
+
+
+
+
 class TransitCalendar:
     def __init__(self):
-        # service_id -> { 'start': 'YYYYMMDD', 'end': 'YYYYMMDD', 'days': [mon, tue, wed, thu, fri, sat, sun] }
         self.regular_schedules = {}
-        # service_id -> { 'added': set(), 'removed': set() }
         self.exceptions = {}
     def set_schedules(self, schedules: dict): 
         self.regular_schedules = schedules
@@ -46,10 +50,6 @@ class TransitCalendar:
         self.exceptions = exceptions
 
     def is_active(self, service_id: str, date_str: str) -> bool:
-        """
-        Sprawdza, czy pociąg faktycznie jedzie w podanym dniu.
-        Format daty to YYYYMMDD, np. '20260308'.
-        """
         if service_id in self.exceptions:
             if date_str in self.exceptions[service_id]['removed']:
                 return False
@@ -67,13 +67,21 @@ class TransitCalendar:
         year = int(date_str[:4])
         month = int(date_str[4:6])
         day = int(date_str[6:8])
-        weekday = datetime.date(year, month, day).weekday()        
+        weekday = date(year, month, day).weekday()        
         return schedule['days'][weekday] == 1
+
+
+def add_days_to_date(date_str: str, days: int) -> str:
+    # date_str to "YYYYMMDD" helper dla TransitGraph 
+    dt = datetime.strptime(date_str, "%Y%m%d")
+    dt += timedelta(days=days)
+    return dt.strftime("%Y%m%d")
+
 
 class TransitGraph():
     def __init__(self):
         self.nodes : dict[str ,Node] = {}
-        self.adjacent : dict[str, list[BaseEdge]] = {} # klucz id wierzchołka, wartość lista krawędzie skierowanych od tego wierzchołka
+        self.adjacent : dict[str, list[BaseEdge]] = {} 
         self.calendar: TransitCalendar = {}
     def add_nodes(self, nodes: list[Node]): 
         for entry in nodes: 
@@ -89,35 +97,40 @@ class TransitGraph():
             self.adjacent[key] = curr 
     def set_calendar(self, calendar: TransitCalendar): 
         self.calendar= calendar
-    def get_valid_neighbours(self, source_node_id: str, current_time: int, current_date: str) -> list:
-        """
-        Zwraca wszystkie możliwe odjazdy z danego przystanku (po current_time),
-        pozwalając na dowolnie długie czekanie. Wyniki są posortowane po czasie odjazdu.
-        """
+
+    def get_valid_neighbours(self, source_node_id: str, current_time: int, start_date: str) -> list:
         valid_moves = []
         neighbours = self.adjacent.get(source_node_id, [])
 
-        # Regularne odjazdy (nie transfery)
+
+        soonest_regular_edges = {}
+
         for edge in neighbours:
             if isinstance(edge, TransferEdge):
-                continue
-            if self.calendar.is_active(edge.service_id, current_date) and edge.departure_time >= current_time:
-                valid_moves.append((edge, edge.arrival_time, False))
+                arrival_time = current_time + edge.transfer_time
+                valid_moves.append((edge, arrival_time))
+            
+            else:
+                current_day_offset = current_time // 86400
+                for day_offset in [current_day_offset - 1, current_day_offset, current_day_offset + 1]:
+                    check_date = add_days_to_date(start_date, day_offset)
+                    
+                    shifted_departure = edge.departure_time + (day_offset * 86400)
+                    shifted_arrival = edge.arrival_time + (day_offset * 86400)
+                    
+                    if shifted_departure >= current_time:
+                        # Czy ten pociąg kursuje w dniu check_date?
+                        if self.calendar.is_active(edge.service_id, check_date):
+                            key = (edge.target_stop_id, edge.route_name)
+                            
+                            if key not in soonest_regular_edges or shifted_departure < soonest_regular_edges[key][1]: 
+                                soonest_regular_edges[key] = (edge, shifted_departure, shifted_arrival)
 
-        # Przesiadki (transfery)
-        for transfer_edge in neighbours:
-            if not isinstance(transfer_edge, TransferEdge):
-                continue
-            time_after_transfer = current_time + transfer_edge.transfer_time
-            target_platform = transfer_edge.target_stop_id
-            next_neighbours = self.adjacent.get(target_platform, [])
-            for next_edge in next_neighbours:
-                if isinstance(next_edge, TransferEdge):
-                    continue
-                if self.calendar.is_active(next_edge.service_id, current_date) and next_edge.departure_time >= time_after_transfer:
-                    valid_moves.append((next_edge, next_edge.arrival_time, True))
 
-        # Sortuj po czasie odjazdu (dla deterministyczności)
+
+        for edge, shifted_dep, shifted_arr in soonest_regular_edges.values():
+            valid_moves.append((edge, shifted_arr))
+
         valid_moves.sort(key=lambda x: x[1])
         return valid_moves
     
