@@ -1,0 +1,5 @@
+(vacuum robot pokoj1)
+(move robot pokoj1 pokoj3)
+(vacuum robot pokoj3)
+(move robot pokoj3 pokoj2)
+(vacuum robot pokoj2)

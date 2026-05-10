@@ -1,0 +1,10 @@
+Algorytm,Heurystyka,Dlugosc planu,Wezly ekspandowane,Czas [s]
+BFS,Brak,15,739812,31.0
+ASTAR,lmcut,15,1152,24.0
+ASTAR,hff,16,353,0.81
+ASTAR,hadd,16,43,0.094
+GBF,hff,17,32,0.047
+GBF,hadd,18,25,0.047
+WASTAR,hff,19,31,0.078
+EHS,hff,19,41,0.078
+IDS,Brak,Timeout,Timeout,>60
