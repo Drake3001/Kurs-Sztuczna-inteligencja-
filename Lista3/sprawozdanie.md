@@ -16,7 +16,7 @@ Planer automatycznie generuje sekwencję akcji (plan) prowadzącą od stanu pocz
 - **pyperplan** — solver PDDL w Pythonie z możliwością wyboru algorytmu przeszukiwania i heurystyki.
 
 
-## 2. Zadanie 1 — Transport paczek (25 pkt)
+## 2. Zadanie 1 — Transport paczek
 
 ### 2.1 Opis problemu
 
@@ -243,7 +243,9 @@ Solver BFWS wygenerował plan o długości **16 kroków**:
 (unload-truck paczka4 truck2 krakow)
 ```
 
-**Obserwacja:** Plan korzysta **wyłącznie z ciężarówek** — samolot i statek nie zostały użyte. Jest to efekt optymalizacji długości planu: transport lotniczy wymaga dodatkowych akcji załadunku/rozładunku (load-plane + fly + unload-plane = 3 akcje), podczas gdy bezpośredni przejazd ciężarówką to 1 akcja. Planer wybiera krótszy plan w sensie liczby akcji.
+**Obserwacja**: Plan korzysta wyłącznie z ciężarówek — samolot i statek nie zostały użyte. Z punktu widzenia optymalizacji liczby kroków (bez uwzględniania kosztów) jest to całkowicie poprawne zachowanie — bezpośredni przejazd ciężarówką to zawsze 1 akcja (drive), podczas gdy transport lotniczy lub morski wymaga aż 3 akcji (load + fly/sail + unload).
+
+Wygenerowany plan ma jednak 16 kroków, co jest wynikiem suboptymalnym (prawdziwe optimum dla tego problemu wynosi 15 kroków). Nie wynika to z uniknięcia samolotu, ale z charakterystyki solvera BFWS. Jest to algorytm satysfakcjonujący (satisficing), który za cel stawia sobie znalezienie dowolnego poprawnego rozwiązania, zamiast gwarantowania najkrótszej ścieżki. W tym przypadku solver wykonał w drugim kroku jedną całkowicie zbędną akcję (drive truck1 wroclaw krakow), po której truck1 pozostaje bezczynna do samego końca, a całą pracę związaną z rozwiezieniem paczek przejmuje truck2.
 
 ### 2.5 Wersja z kosztami — `domain_costs.pddl`
 
@@ -266,33 +268,29 @@ Przypisane koszty:
 | `load/unload-ship` | 1 | Przeładunek statku |
 
 
-**Wygenerowany plan (BFWS, z kosztami) — 20 kroków, koszt = 20:**
+**Wygenerowany plan (Fast Downward z A* i LmCut) — 15 kroków, całkowity koszt = 55:**
 
 ```
-(load-plane paczka1 plane1 wroclaw)
-(fly plane1 wroclaw gdansk)
-(unload-plane paczka1 plane1 gdansk)
-(drive truck1 wroclaw krakow)
-(load-truck paczka2 truck1 krakow)
-(drive truck1 krakow warszawa)
-(drive truck1 warszawa poznan)
-(unload-truck paczka2 truck1 poznan)
-(drive truck1 poznan warszawa)
-(load-truck paczka3 truck1 warszawa)
-(drive truck2 warszawa poznan)
-(drive truck2 poznan gdansk)
-(drive truck1 warszawa poznan)
-(drive truck1 poznan wroclaw)
-(unload-truck paczka3 truck1 wroclaw)
-(load-truck paczka4 truck2 gdansk)
-(drive truck2 gdansk poznan)
-(drive truck2 poznan wroclaw)
-(drive truck2 wroclaw krakow)
-(unload-truck paczka4 truck2 krakow)
+load-truck paczka3 truck2 warszawa (koszt: 1)
+load-ship paczka4 ship1 gdansk (koszt: 1)
+sail ship1 gdansk warszawa (koszt: 5)
+unload-ship paczka4 ship1 warszawa (koszt: 1)
+load-truck paczka4 truck2 warszawa (koszt: 1)
+drive truck2 warszawa krakow (koszt: 10)
+unload-truck paczka4 truck2 krakow (koszt: 1)
+load-truck paczka2 truck2 krakow (koszt: 1)
+drive truck2 krakow wroclaw (koszt: 10)
+unload-truck paczka3 truck2 wroclaw (koszt: 1)
+load-truck paczka1 truck2 wroclaw (koszt: 1)
+drive truck2 wroclaw poznan (koszt: 10)
+unload-truck paczka2 truck2 poznan (koszt: 1)
+drive truck2 poznan gdansk (koszt: 10)
+unload-truck paczka1 truck2 gdansk (koszt: 1)
 ```
 
 
-**Wnioski:** W wersji z kosztami planer **wykorzystał samolot** do transportu paczka1 do Gdańska (fly, koszt 50+2+2=54), ale plan jest dłuższy (20 vs 16). Solver minimalizuje łączny koszt, nie długość planu.
+**Wnioski:** W optymalnym kosztowo planie planer **nie wykorzystał samolotu** ani razu. Zamiast płacić 50 za bardzo drogi lot z Wrocławia do Gdańska, solver przerzucił większość pracy na objazdową trasę ciężarówki, łącząc ją z tanim transportem statkiem (koszt: 5) z Gdańska do Warszawy w celu dostarczenia jednej z paczek na wschód kraju. Algorytm pomyślnie zminimalizował łączny koszt (55 w porównaniu do potencjalnego użycia samolotu, które samo pochłonęłoby przynajmniej 54 jednostki na jedną trasę). Wniosek płynie stąd taki, że o ile samolot jest szybki, o tyle bez dodatkowych wymogów czasowych, minimalizacja kosztów będzie silnie preferowała transport morski i kołowy.
+
 ### 2.6 Eksperyment A: Porównanie algorytmów przeszukiwania
 
 Przeprowadzono porównanie 9 konfiguracji algorytmów przeszukiwania dostępnych w solverze **pyperplan** na tym samym problemie (pełna topologia, bez kosztów):
@@ -325,7 +323,7 @@ Niestety **pyperplan** nie dał rady wygenerować planu dla wariantu z kosztami,
 5. **BFWS** (16 kroków, wynik z internetowego solvera) błyskawicznie (0.001s) znajduje przyzwoity kompromis przy niewielkiej liczbie rozszerzonych węzłów (206), balansując pomiędzy optymalnością a wydajnością obliczeniową.
 
 
-## 3. Zadanie 2 — Robot odkurzacz (15 pkt)
+## 3. Zadanie 2 — Robot odkurzacz
 
 ### 3.1 Opis problemu
 
@@ -397,7 +395,7 @@ Plan optymalny — **5 kroków** (A*(LmCut): 6 węzłów, czas ~0s):
 - Kolejność pokoj1→pokoj3→pokoj2 (zamiast pokoj1→pokoj2→pokoj3) jest jedną z dwóch równoważnych optymalnych ścieżek — obie wymagają dokładnie 5 kroków, ponieważ w modelu nie ma topologii połączeń (robot może się przenieść między dowolnymi pokojami).
 
 
-## 4. Zadanie 3 — Robot z piłkami (10 pkt)
+## 4. Zadanie 3 — Robot z piłkami
 
 ### 4.1 Opis problemu
 
@@ -496,6 +494,6 @@ Każda tura = 5 akcji, plus 1 akcja `move` powrotna między turami = **2×5 + 1 
 
 ## 5. Wnioski końcowe
 
- **Wybór algorytmu przeszukiwania** ma zasadniczy wpływ na efektywność planowania. Algorytmy optymalne (BFS, A* z dopuszczalną heurystyką) gwarantują najkrótszy plan, ale kosztem eksponencjalnie większej przestrzeni przeszukiwania. Algorytmy zachłanne (GBF) są tysiące razy szybsze, akceptując suboptymalne plany. **Heurystyka LmCut** okazała się jedyną heurystyką gwarantującą optymalność w A*, redukując liczbę ekspandowanych węzłów z 740 292 (BFS) do 1 153 przy zachowaniu optymalnego planu.
+ **Wybór algorytmu przeszukiwania** ma zasadniczy wpływ na efektywność planowania. Algorytmy optymalne (BFS, A* z dopuszczalną heurystyką) gwarantują najkrótszy plan, ale kosztem eksponencjalnie większej przestrzeni przeszukiwania. Algorytmy zachłanne (GBF) są tysiące razy szybsze, akceptując suboptymalne plany. **Heurystyka LmCut** okazała się jedyną heurystyką gwarantującą optymalność w A*, redukując liczbę ekspandowanych węzłów z 739 884 (BFS) do zaledwie 1 137 przy zachowaniu optymalnego planu.
 
 
