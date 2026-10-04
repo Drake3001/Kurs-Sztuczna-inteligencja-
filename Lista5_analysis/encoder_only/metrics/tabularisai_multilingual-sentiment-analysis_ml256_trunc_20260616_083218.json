@@ -1,0 +1,59 @@
+{
+    "model": "tabularisai/multilingual-sentiment-analysis",
+    "param_id": "ml256_trunc",
+    "batch_size": 16,
+    "truncation": true,
+    "max_length": 256,
+    "kwargs": {
+        "batch_size": 16,
+        "truncation": true,
+        "max_length": 256
+    },
+    "id2label": {
+        "0": "Very Negative",
+        "1": "Negative",
+        "2": "Neutral",
+        "3": "Positive",
+        "4": "Very Positive"
+    },
+    "timestamp": "20260616_083218",
+    "ogolne_metryki": {
+        "accuracy": 0.8273615635179153,
+        "f1_macro": 0.815434617869211,
+        "recall_macro": 0.8271316181468467,
+        "precision_macro": 0.8080525053641298
+    },
+    "detailed_report": {
+        "__label__meta_minus_m": {
+            "precision": 0.8736842105263158,
+            "recall": 0.83,
+            "f1-score": 0.8512820512820513,
+            "support": 300.0
+        },
+        "__label__meta_plus_m": {
+            "precision": 0.8526315789473684,
+            "recall": 0.8223350253807107,
+            "f1-score": 0.8372093023255814,
+            "support": 197.0
+        },
+        "__label__meta_zero": {
+            "precision": 0.697841726618705,
+            "recall": 0.8290598290598291,
+            "f1-score": 0.7578125,
+            "support": 117.0
+        },
+        "accuracy": 0.8273615635179153,
+        "macro avg": {
+            "precision": 0.8080525053641298,
+            "recall": 0.8271316181468467,
+            "f1-score": 0.815434617869211,
+            "support": 614.0
+        },
+        "weighted avg": {
+            "precision": 0.8334220948288514,
+            "recall": 0.8273615635179153,
+            "f1-score": 0.8289558801999266,
+            "support": 614.0
+        }
+    }
+}

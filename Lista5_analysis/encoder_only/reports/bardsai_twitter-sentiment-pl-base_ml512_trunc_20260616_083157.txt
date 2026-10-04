@@ -1,0 +1,15 @@
+Model: bardsai/twitter-sentiment-pl-base
+Parametry: param_id=ml512_trunc, batch_size=16, truncation=True, max_length=512
+Accuracy: 0.7622
+F1 macro: 0.7240
+
+Szczegółowy raport (Quality per class):
+                       precision    recall  f1-score   support
+
+__label__meta_minus_m       0.91      0.73      0.81       300
+ __label__meta_plus_m       0.75      0.93      0.83       197
+   __label__meta_zero       0.50      0.56      0.53       117
+
+             accuracy                           0.76       614
+            macro avg       0.72      0.74      0.72       614
+         weighted avg       0.78      0.76      0.76       614

@@ -1,0 +1,15 @@
+Model: tabularisai/multilingual-sentiment-analysis
+Parametry: param_id=ml64_trunc, batch_size=16, truncation=True, max_length=64
+Accuracy: 0.7068
+F1 macro: 0.6962
+
+Szczegółowy raport (Quality per class):
+                       precision    recall  f1-score   support
+
+__label__meta_minus_m       0.79      0.70      0.74       300
+ __label__meta_plus_m       0.69      0.70      0.69       197
+   __label__meta_zero       0.58      0.74      0.65       117
+
+             accuracy                           0.71       614
+            macro avg       0.69      0.71      0.70       614
+         weighted avg       0.72      0.71      0.71       614

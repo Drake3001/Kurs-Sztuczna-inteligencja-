@@ -1,0 +1,57 @@
+{
+    "model": "Voicelab/herbert-base-cased-sentiment",
+    "param_id": "ml128_trunc",
+    "batch_size": 16,
+    "truncation": true,
+    "max_length": 128,
+    "kwargs": {
+        "batch_size": 16,
+        "truncation": true,
+        "max_length": 128
+    },
+    "id2label": {
+        "0": "negative",
+        "1": "neutral",
+        "2": "positive"
+    },
+    "timestamp": "20260616_083037",
+    "ogolne_metryki": {
+        "accuracy": 0.745928338762215,
+        "f1_macro": 0.6405496103300556,
+        "recall_macro": 0.6598093915860413,
+        "precision_macro": 0.6616602856522212
+    },
+    "detailed_report": {
+        "__label__meta_minus_m": {
+            "precision": 0.9393939393939394,
+            "recall": 0.8266666666666667,
+            "f1-score": 0.8794326241134752,
+            "support": 300.0
+        },
+        "__label__meta_plus_m": {
+            "precision": 0.6423611111111112,
+            "recall": 0.9390862944162437,
+            "f1-score": 0.7628865979381443,
+            "support": 197.0
+        },
+        "__label__meta_zero": {
+            "precision": 0.4032258064516129,
+            "recall": 0.21367521367521367,
+            "f1-score": 0.27932960893854747,
+            "support": 117.0
+        },
+        "accuracy": 0.745928338762215,
+        "macro avg": {
+            "precision": 0.6616602856522212,
+            "recall": 0.6598093915860413,
+            "f1-score": 0.6405496103300556,
+            "support": 614.0
+        },
+        "weighted avg": {
+            "precision": 0.7419230294167907,
+            "recall": 0.745928338762215,
+            "f1-score": 0.7276873147779592,
+            "support": 614.0
+        }
+    }
+}

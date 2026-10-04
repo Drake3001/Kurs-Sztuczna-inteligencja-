@@ -1,0 +1,57 @@
+{
+    "model": "bardsai/twitter-sentiment-pl-base",
+    "param_id": "ml512_trunc",
+    "batch_size": 16,
+    "truncation": true,
+    "max_length": 512,
+    "kwargs": {
+        "batch_size": 16,
+        "truncation": true,
+        "max_length": 512
+    },
+    "id2label": {
+        "0": "positive",
+        "1": "neutral",
+        "2": "negative"
+    },
+    "timestamp": "20260616_083157",
+    "ogolne_metryki": {
+        "accuracy": 0.762214983713355,
+        "f1_macro": 0.7240271948174026,
+        "recall_macro": 0.739274299680391,
+        "precision_macro": 0.7220177659454144
+    },
+    "detailed_report": {
+        "__label__meta_minus_m": {
+            "precision": 0.9090909090909091,
+            "recall": 0.7333333333333333,
+            "f1-score": 0.8118081180811808,
+            "support": 300.0
+        },
+        "__label__meta_plus_m": {
+            "precision": 0.7530864197530864,
+            "recall": 0.9289340101522843,
+            "f1-score": 0.8318181818181818,
+            "support": 197.0
+        },
+        "__label__meta_zero": {
+            "precision": 0.5038759689922481,
+            "recall": 0.5555555555555556,
+            "f1-score": 0.5284552845528455,
+            "support": 117.0
+        },
+        "accuracy": 0.762214983713355,
+        "macro avg": {
+            "precision": 0.7220177659454144,
+            "recall": 0.739274299680391,
+            "f1-score": 0.7240271948174026,
+            "support": 614.0
+        },
+        "weighted avg": {
+            "precision": 0.7818221266949898,
+            "recall": 0.762214983713355,
+            "f1-score": 0.7642343412625716,
+            "support": 614.0
+        }
+    }
+}

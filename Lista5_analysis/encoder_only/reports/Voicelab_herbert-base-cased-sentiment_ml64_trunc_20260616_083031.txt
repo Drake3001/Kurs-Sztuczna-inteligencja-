@@ -1,0 +1,15 @@
+Model: Voicelab/herbert-base-cased-sentiment
+Parametry: param_id=ml64_trunc, batch_size=16, truncation=True, max_length=64
+Accuracy: 0.6889
+F1 macro: 0.6182
+
+Szczegółowy raport (Quality per class):
+                       precision    recall  f1-score   support
+
+__label__meta_minus_m       0.92      0.71      0.80       300
+ __label__meta_plus_m       0.63      0.89      0.74       197
+   __label__meta_zero       0.34      0.30      0.32       117
+
+             accuracy                           0.69       614
+            macro avg       0.63      0.63      0.62       614
+         weighted avg       0.72      0.69      0.69       614

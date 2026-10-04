@@ -1,0 +1,59 @@
+{
+    "model": "tabularisai/multilingual-sentiment-analysis",
+    "param_id": "ml128_trunc",
+    "batch_size": 16,
+    "truncation": true,
+    "max_length": 128,
+    "kwargs": {
+        "batch_size": 16,
+        "truncation": true,
+        "max_length": 128
+    },
+    "id2label": {
+        "0": "Very Negative",
+        "1": "Negative",
+        "2": "Neutral",
+        "3": "Positive",
+        "4": "Very Positive"
+    },
+    "timestamp": "20260616_083211",
+    "ogolne_metryki": {
+        "accuracy": 0.7768729641693811,
+        "f1_macro": 0.7667861113801204,
+        "recall_macro": 0.7793403907617105,
+        "precision_macro": 0.7584815077094138
+    },
+    "detailed_report": {
+        "__label__meta_minus_m": {
+            "precision": 0.8362989323843416,
+            "recall": 0.7833333333333333,
+            "f1-score": 0.8089500860585198,
+            "support": 300.0
+        },
+        "__label__meta_plus_m": {
+            "precision": 0.7628865979381443,
+            "recall": 0.751269035532995,
+            "f1-score": 0.7570332480818415,
+            "support": 197.0
+        },
+        "__label__meta_zero": {
+            "precision": 0.6762589928057554,
+            "recall": 0.8034188034188035,
+            "f1-score": 0.734375,
+            "support": 117.0
+        },
+        "accuracy": 0.7768729641693811,
+        "macro avg": {
+            "precision": 0.7584815077094138,
+            "recall": 0.7793403907617105,
+            "f1-score": 0.7667861113801204,
+            "support": 614.0
+        },
+        "weighted avg": {
+            "precision": 0.7822486020641535,
+            "recall": 0.7768729641693811,
+            "f1-score": 0.7780821672470337,
+            "support": 614.0
+        }
+    }
+}

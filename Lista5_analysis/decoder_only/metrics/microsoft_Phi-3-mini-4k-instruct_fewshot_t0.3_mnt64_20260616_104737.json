@@ -1,0 +1,50 @@
+{
+    "model": "microsoft/Phi-3-mini-4k-instruct",
+    "prompt_kind": "fewshot",
+    "config_id": "fewshot_t0.3_mnt64",
+    "do_sample": true,
+    "temperature": 0.3,
+    "max_new_tokens": 64,
+    "timestamp": "20260616_104737",
+    "ogolne_metryki": {
+        "accuracy": 0.8273615635179153,
+        "f1_macro": 0.79142713178747,
+        "recall_macro": 0.7941165921876582,
+        "precision_macro": 0.7900605649657274,
+        "parse_success_rate": 1.0,
+        "n_parse_failed": 0
+    },
+    "detailed_report": {
+        "__label__meta_minus_m": {
+            "precision": 0.8956228956228957,
+            "recall": 0.8866666666666667,
+            "f1-score": 0.8911222780569514,
+            "support": 300.0
+        },
+        "__label__meta_plus_m": {
+            "precision": 0.8776595744680851,
+            "recall": 0.8375634517766497,
+            "f1-score": 0.8571428571428571,
+            "support": 197.0
+        },
+        "__label__meta_zero": {
+            "precision": 0.5968992248062015,
+            "recall": 0.6581196581196581,
+            "f1-score": 0.6260162601626016,
+            "support": 117.0
+        },
+        "accuracy": 0.8273615635179153,
+        "macro avg": {
+            "precision": 0.7900605649657274,
+            "recall": 0.7941165921876582,
+            "f1-score": 0.79142713178747,
+            "support": 614.0
+        },
+        "weighted avg": {
+            "precision": 0.8329365051456141,
+            "recall": 0.8273615635179153,
+            "f1-score": 0.8297031412267959,
+            "support": 614.0
+        }
+    }
+}
